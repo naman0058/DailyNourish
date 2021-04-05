@@ -50,7 +50,7 @@ router.post('/insert',upload.single('image'),(req,res)=>{
 
 
 router.get('/all',(req,res)=>{
-	pool.query(`select * from ${table} order by id desc`,(err,result)=>{
+	pool.query(`select * from ${table} order by name`,(err,result)=>{
 		if(err) throw err;
         else res.json(result)
 	})

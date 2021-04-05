@@ -41,7 +41,7 @@ router.post('/insert',upload.single('image'),(req,res)=>{
 router.get('/all',(req,res)=>{
 	pool.query(`select s.* , 
     (select c.name from category c where c.id = s.categoryid) as categoryname
-     from ${table} s order by name desc `,(err,result)=>{
+     from ${table} s order by name  `,(err,result)=>{
 		if(err) throw err;
         else res.json(result)
 	})

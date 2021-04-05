@@ -31,7 +31,7 @@ router.get('/',(req,res)=>{
 
 
 router.get('/allcategory',(req,res)=>{
-	pool.query(`select * from category order by name desc;`,(err,result)=>{
+	pool.query(`select * from category order by name ;`,(err,result)=>{
 		if(err) throw err;
         else res.json(result)
 	})
