@@ -33,12 +33,10 @@ table+=`<tr>
 
 <td>${item.name}</td>
 <td>${item.number}</td>
+<td><a href='/customers/wishlist/?number=${item.number}'>Wishlist</a></td>
+<td><a href='/customers/orders/?number=${item.number}'>Orders</a></td>
 <td>
-<select class='form-control action' id='action'>
-<option>Choose Option</option>
-<option value='wishlist'>Wishlist</option>
-<option value='orders'>Orders</option>
-</select>
+
 </td>
 </tr>`
 })

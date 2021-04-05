@@ -146,15 +146,16 @@ router.post('/update_image',upload.single('image'), (req, res) => {
 
 
 router.get('/wishlist',(req,res)=>{
-	pool.query(`select * from cart where number = '${req.body.number}'`,(err,result)=>{
+	pool.query(`select * from cart where usernumber = '${req.query.number}' and status is null`,(err,result)=>{
 		if(err) throw err;
-        else res.render('show-orders',{result:result})
+       // else res.json(result)
+        else res.render('show-wishlist',{result:result})
 	})
 })
 
 
 router.get('/orders',(req,res)=>{
-	pool.query(`select * from booking where number = '${req.body.number}' `,(err,result)=>{
+	pool.query(`select * from booking where number = '${req.query.number}' `,(err,result)=>{
 		if(err) throw err;
         else res.render('show-orders',{result:result})
 	})

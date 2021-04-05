@@ -17,8 +17,9 @@ today = mm + '/' + dd + '/' + yyyy;
 
 router.post('/index-category',(req,res)=>{
     var query = `select * from category order by id desc limit 6;`
-    var query1 = `select count(id) as counter from cart where usernumber ='${req.body.number}';`
-	pool.query(query+query1,(err,result)=>{
+    var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
+      var query2 = `select sum(price) as amount from cart where usernumber ='${req.body.number}' and status is null;`
+	pool.query(query+query1+query2,(err,result)=>{
 		if(err) throw err;
         else res.json(result)
 	});
@@ -31,7 +32,7 @@ router.get('/',(req,res)=>{
 
 
 router.get('/allcategory',(req,res)=>{
-	pool.query(`select * from category order by name ;`,(err,result)=>{
+	pool.query(`select * from category `,(err,result)=>{
 		if(err) throw err;
         else res.json(result)
 	})
@@ -41,17 +42,26 @@ router.get('/allcategory',(req,res)=>{
 
 router.post('/subcategory',(req,res)=>{
       var query = `select s.* , (select c.name from category c where c.id = s.categoryid) as categoryname from subcategory s where s.categoryid = '${req.body.categoryid}';`
-      var query1 = `select count(id) as counter from cart where usernumber ='${req.body.number}';`
-      pool.query(query+query1,(err,result)=>{
+        var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
+      var query2 = `select sum(price) as amount from cart where usernumber ='${req.body.number}' and status is null;`
+      pool.query(query+query1+query2,(err,result)=>{
         if(err) throw err;
         else res.json(result)
     })
 })
 
+
+
 router.post('/services',(req,res)=>{
-       var query = `select s.* , (select su.name from subcategory su where su.id = s.subcategoryid) as subcategoryname from product s where s.subcategoryid = '${req.body.subcategoryid}';`
-      var query1 = `select count(id) as counter from cart where usernumber ='${req.body.number}';`
-    pool.query(query+query1,(err,result)=>{
+      var query = `select s.* , 
+                    (select su.name from subcategory su where su.id = s.subcategoryid) as subcategoryname, 
+                    (select c.quantity from cart c where c.booking_id = s.id and c.usernumber = '${req.body.number}' and c.status is null  ) as userquantity,
+                    (select si.name from size si where si.id = s.sizeid) as sizename
+                     from product s where s.subcategoryid = '${req.body.subcategoryid}';`
+   var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
+      var query2 = `select sum(price) as amount from cart where usernumber ='${req.body.number}' and status is null;`
+      
+    pool.query(query+query1+query2,(err,result)=>{
         if(err) throw err;
         else res.json(result)
     })
@@ -218,10 +228,11 @@ router.post("/cart/all", (req, res) => {
 router.post("/mycart", (req, res) => {
  
     var query = `select c.*,(select s.name from product s where s.id = c.booking_id) as servicename
-    ,(select s.image from product s where s.id = c.booking_id) as productlogo
-    from cart c where c.usernumber = '${req.body.usernumber}';`
-    var query1 = `select count(id) as counter from cart where usernumber = '${req.body.usernumber}';`
-    var query2 = `select sum(price) as total_ammount from cart where usernumber = '${req.body.usernumber}';`
+    ,(select s.image from product s where s.id = c.booking_id) as productlogo,
+      (select si.name from size si where si.id = c.booking_id) as sizename
+    from cart c where c.usernumber = '${req.body.usernumber}' and c.status is null;`
+    var query1 = `select count(id) as counter from cart where usernumber = '${req.body.usernumber}' and status is null;`
+    var query2 = `select sum(price) as total_ammount from cart where usernumber = '${req.body.usernumber}' and status is null;`
     pool.query(query+query1+query2, (err, result) => {
       if (err) throw err;
       else if (result[0][0]) {
@@ -381,7 +392,7 @@ router.post('/check',(req,res)=>{
 
 
 router.post('/running-orders',(req,res)=>{
-	pool.query(`select * from booking where number = '${req.body.number}' and status!='completed' `,(err,result)=>{
+	pool.query(`select * from booking where number = '${req.body.number}' and status!='completed' order by id desc `,(err,result)=>{
 		if(err) throw err;
         else res.json(result)
 	})
@@ -391,7 +402,7 @@ router.post('/running-orders',(req,res)=>{
 
 
 router.post('/orders/history',(req,res)=>{
-	pool.query(`select * from booking where number = '${req.body.number}' and status = 'completed' `,(err,result)=>{
+	pool.query(`select * from booking where number = '${req.body.number}' and status = 'completed' order by id desc `,(err,result)=>{
 		if(err) throw err;
         else res.json(result)
 	})
@@ -400,7 +411,7 @@ router.post('/orders/history',(req,res)=>{
 
 
 router.post('/orders/cancel',(req,res)=>{
-	pool.query(`select * from cancel_booking where number = '${req.body.number}' `,(err,result)=>{
+	pool.query(`select * from cancel_booking where number = '${req.body.number}' order by id desc `,(err,result)=>{
 		if(err) throw err;
         else res.json(result)
 	})
@@ -435,9 +446,19 @@ router.post('/orders',(req,res)=>{
     body['status'] = 'pending'
     pool.query(`insert into booking set ?`,body,(err,result)=>{
         if(err) throw err;
-        else res.json({
+        else {
+           
+            pool.query(`update cart set status = 'booked' , orderid = '${result.insertId}' where usernumber = '${req.body.number}' and status is null`,(err,result)=>{
+                if(err) throw err;
+                else {
+                     res.json({
             msg :'success'
         })
+                }
+            })
+            
+        }
+       
     })
 })
 
@@ -456,8 +477,6 @@ router.get('/time',(req,res)=>{
 
 
 
-
-   
 router.post("/cart-handler", (req, res) => {
         let body = req.body
         if (req.body.quantity == "0" || req.body.quantity == 0) {
@@ -471,44 +490,44 @@ router.post("/cart-handler", (req, res) => {
         })
         }
         else {
-            pool.query(`select * from cart where booking_id = '${req.body.booking_id}' and  categoryid = '${req.body.categoryid}' and usernumber = '${req.body.usernumber}'`,(err,result)=>{
+            pool.query(`select * from cart where booking_id = '${req.body.booking_id}' and  categoryid = '${req.body.categoryid}' and usernumber = '${req.body.usernumber}' and status is null`,(err,result)=>{
                 if (err) throw err;
                 else if (result[0]) {
-                    res.json(result[0])
-                    // pool.query(`update cart set quantity = ${req.body.quantity} , price = ${result[0].oneprice}*${req.body.quantity}  where booking_id = '${req.body.booking_id}' and categoryid = '${req.body.categoryid}' and usernumber = '${req.body.usernumber}'`,(err,result)=>{
-                    //     if (err) throw err;
-                    //     else {
-                    //         res.json({
-                    //           msg: "updated sucessfully",
-                    //         });
-                    //       }
+                  //  res.json(result[0])
+                    pool.query(`update cart set quantity = ${req.body.quantity} , price = ${result[0].oneprice}*${req.body.quantity}  where booking_id = '${req.body.booking_id}' and categoryid = '${req.body.categoryid}' and usernumber = '${req.body.usernumber}'`,(err,result)=>{
+                        if (err) throw err;
+                        else {
+                            res.json({
+                              msg: "updated sucessfully",
+                            });
+                          }
 
-                    // })
+                    })
                 }
                 else {
-                    res.json(result)
-                    // pool.query(
-                    //     `select * from product where id = '${req.body.booking_id}' `,
-                    //     (err, result) => {
-                    //       if (err) throw err;
-                    //       else {
-                    //         body["categoryid"] = result[0].categoryid;
-                    //         body["subcategoryid"] = result[0].subcategoryid;
-                    //         body["price"] = result[0].price*req.body.quantity;
-                    //         body["oneprice"] = result[0].price;
+                   // res.json(result)
+                    pool.query(
+                        `select * from product where id = '${req.body.booking_id}' `,
+                        (err, result) => {
+                          if (err) throw err;
+                          else {
+                            body["categoryid"] = result[0].categoryid;
+                            body["subcategoryid"] = result[0].subcategoryid;
+                            body["price"] = result[0].net_amount*req.body.quantity;
+                            body["oneprice"] = result[0].net_amount;
                         
                             
-                    //         pool.query(`insert into cart set ?`, body, (err, result) => {
-                    //           if (err) throw err;
-                    //           else {
-                    //             res.json({
-                    //               msg: "updated sucessfully",
-                    //             });
-                    //           }
-                    //         });
-                    //       }
+                            pool.query(`insert into cart set ?`, body, (err, result) => {
+                              if (err) throw err;
+                              else {
+                                res.json({
+                                  msg: "updated sucessfully",
+                                });
+                              }
+                            });
+                          }
                     
-                    //     })
+                        })
 
                 }
 
@@ -632,15 +651,36 @@ router.post('/get-single-product-details',(req,res)=>{
 
 
 router.post('/get-single-cancel-booking-details',(req,res)=>{
-    pool.query(`select * from cancel_booking where id = '${req.body.id}'`,(err,result)=>{
+    
+     var query = `select * from cancel_booking where id = '${req.body.id}';`
+   var query1 = `select c.*,(select s.name from product s where s.id = c.booking_id) as servicename
+    ,(select s.image from product s where s.id = c.booking_id) as productlogo,
+      (select si.name from size si where si.id = c.booking_id) as sizename
+    from cart c where c.usernumber = '${req.body.usernumber}' and orderid = '${req.body.orderid}';`
+    var query2 = `select count(id) as counter from cart where usernumber = '${req.body.usernumber}' and orderid = '${req.body.orderid}';`
+    var query3 = `select sum(price) as total_ammount from cart where usernumber = '${req.body.usernumber}'  and orderid = '${req.body.orderid}';`
+    pool.query(query+query1+query2+query3,(err,result)=>{
         if(err) throw err;
         else res.json(result);
     })
+   
+    // pool.query(`select * from cancel_booking where id = '${req.body.id}'`,(err,result)=>{
+    //     if(err) throw err;
+    //     else res.json(result);
+    // })
 })
 
 
+
 router.post('/get-single-booking-details',(req,res)=>{
-    pool.query(`select * from booking where id = '${req.body.id}'`,(err,result)=>{
+    var query = `select * from booking where id = '${req.body.id}';`
+   var query1 = `select c.*,(select s.name from product s where s.id = c.booking_id) as servicename
+    ,(select s.image from product s where s.id = c.booking_id) as productlogo,
+      (select si.name from size si where si.id = c.booking_id) as sizename
+    from cart c where c.usernumber = '${req.body.usernumber}' and c.orderid = '${req.body.id}';`
+    var query2 = `select count(id) as counter from cart where usernumber = '${req.body.usernumber}' and orderid = '${req.body.id}';`
+    var query3 = `select sum(price) as total_ammount from cart where usernumber = '${req.body.usernumber}'  and orderid = '${req.body.id}';`
+    pool.query(query+query1+query2+query3,(err,result)=>{
         if(err) throw err;
         else res.json(result);
     })
@@ -653,7 +693,7 @@ router.post('/reorder',(req,res)=>{
     
     
     if(req.body.status=='fromcancel'){
-         pool.query(`select categoryid , subcategoryid , booking_id , number  , amount  , name , address , pincode , quantity  from cancel_booking where id = '${req.body.id}'`,(err,result)=>{
+         pool.query(`select categoryid , subcategoryid , booking_id , number  , amount  , name , address , pincode , quantity , orderid as id from cancel_booking where id = '${req.body.id}'`,(err,result)=>{
         if(err) throw err;
         else {
            
@@ -663,6 +703,7 @@ router.post('/reorder',(req,res)=>{
             data['time'] = req.body.time
             data['order_date'] = today
             data['date'] = req.body.date
+            
               pool.query(`insert into booking set ?`,data,(err,result)=>{
         if(err) throw err;
         else res.json({
@@ -675,7 +716,7 @@ router.post('/reorder',(req,res)=>{
     })
     }
     else {
-         pool.query(`select categoryid , subcategoryid , booking_id , number  , amount , status , name , address , pincode , quantity  from booking where id = '${req.body.id}'`,(err,result)=>{
+         pool.query(`select categoryid , subcategoryid , booking_id , number  , amount , status , name , address , pincode , quantity   from booking where id = '${req.body.id}'`,(err,result)=>{
         if(err) throw err;
         else {
            
@@ -724,6 +765,37 @@ router.post('/reorder',(req,res)=>{
 //   );
 // });
 
+
+
+
+
+
+router.post('/remove-all-data',(req,res)=>{
+    pool.query(`delete from cart where usernumber = '${req.body.number}'`,(err,result)=>{
+        if(err) throw err;
+        else {
+            res.json({
+                msg : 'success'
+            })
+        }
+    })
+})
+
+
+
+
+
+
+router.post('/remove-all-data-by-id',(req,res)=>{
+    pool.query(`delete from cart where usernumber = '${req.body.number}' and id ='${req.body.id}'`,(err,result)=>{
+        if(err) throw err;
+        else {
+            res.json({
+                msg : 'success'
+            })
+        }
+    })
+})
 
 
 
