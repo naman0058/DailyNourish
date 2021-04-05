@@ -4,14 +4,11 @@ require('dotenv').config()
 
 const pool = mysql.createPool({
  
-// host : 'db-mysql-blr1-05486-do-user-9022348-0.b.db.ondigitalocean.com',
-host:'localhost',
-user:'root',
- //  user: 'doadmin',
-   // password : 'm8wcz9akv2dbl1jy',
-   password:'123',
+ host : 'db-mysql-blr1-05486-do-user-9022348-0.b.db.ondigitalocean.com',
+   user: 'doadmin',
+    password : 'm8wcz9akv2dbl1jy',
     database: 'dailynourish',
-    port:'3306' ,
+    port:'25060' ,
     multipleStatements: true
   })
 
