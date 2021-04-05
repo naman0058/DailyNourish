@@ -20,7 +20,9 @@
                     <th>Category Name</th>
                     <th>Sale Quantity</th>
                     <th>Price</th>
-                    <th>Image</th>
+                    <th>Discount</th>
+                    <th>Net Amount</th>
+              
                    
                     </tr>
                     </thead>
@@ -30,7 +32,15 @@
 
                         <% for(i=0;i<result.length;i++){ %>
                   <tr>
-                    
+
+                    <td><%=result[i].name%></td>
+                    <td><%=result[i].short_name%></td>
+                    <td><%=result[i].categoryname%></td>
+                    <td><%=result[i].quantity%></td>
+                    <td><%=result[i].price%></td>
+                    <td><%=result[i].discount%></td>
+                    <td><%=result[i].net_amount%></td>
+               
                   
                     </tr>
 

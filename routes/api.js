@@ -16,7 +16,7 @@ today = mm + '/' + dd + '/' + yyyy;
 
 
 router.post('/index-category',(req,res)=>{
-    var query = `select * from category limit 6 order by id desc;`
+    var query = `select * from category order by id desc limit 6;`
     var query1 = `select count(id) as counter from cart where usernumber ='${req.body.number}';`
 	pool.query(query+query1,(err,result)=>{
 		if(err) throw err;

@@ -57,7 +57,7 @@ router.get('/sales-report',(req,res)=>{
 
 
 router.get('/stock-report',(req,res)=>{
-  pool.query(`select * from cancel_booking order by id desc `,(err,result)=>{
+  pool.query(`select p.* , (select c.name from category c where c.id = p.categoryid) as categoryname from product p order by quantity `,(err,result)=>{
     if(err) throw err;
     else res.render('sales-report',{result:result})
   })
