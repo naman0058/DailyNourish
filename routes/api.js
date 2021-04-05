@@ -465,7 +465,7 @@ router.post('/orders',(req,res)=>{
 
 
 router.get('/time',(req,res)=>{
-    pool.query(`select * from time where date >= CURDATE()`,(err,result)=>{
+    pool.query(`select * from time where date>= CURDATE()`,(err,result)=>{
         if(err) throw err;
         else res.json(result)
     })
