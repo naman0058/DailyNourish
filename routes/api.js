@@ -527,7 +527,7 @@ router.post("/cart-handler", (req, res) => {
                     })
                 }
                 else {
-                  body["price"] = result[0].net_amount*req.body.quantity;
+                  body["price"] = result.body.net_amount*req.body.quantity;
                      pool.query(`insert into cart set ?`, body, (err, result) => {
                      if (err) throw err;
                      else {
