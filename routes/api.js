@@ -20,9 +20,11 @@ router.post('/index-category',(req,res)=>{
     var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
       var query2 = `select sum(price) as amount from cart where usernumber ='${req.body.number}' and status is null;`
       var query3 = `select * from banner where type = 'Front Banner';`
-      var query4 = `select p.id,p.name,p.categoryid , p.subcategoryid, p.price , p.quantity , p.net_amount , p.image,
-      (select si.name from size si where si.id = p.sizeid) as sizename
-      from product p order by id desc limit 5;`
+      var query4 = `select  s.id,s.name, s.price , s.quantity , s.net_amount , s.image,* , 
+                    (select su.name from subcategory su where su.id = s.subcategoryid) as subcategoryname, 
+                    (select c.quantity from cart c where c.booking_id = s.id and c.usernumber = '${req.body.number}' and c.status is null  ) as userquantity,
+                    (select si.name from size si where si.id = s.sizeid) as sizename
+                     from product s order by id desc limit 5;`
       var query5 = `select * from banner where type = 'Bottom Banner';`
 	pool.query(query+query1+query2+query3+query4+query5,(err,result)=>{
 		if(err) throw err;
