@@ -512,7 +512,7 @@ router.post("/cart-handler", (req, res) => {
         })
         }
         else {
-            pool.query(`select * from cart where booking_id = '${req.body.booking_id}' and  categoryid = '${req.body.categoryid}' and usernumber = '${req.body.usernumber}' and status is null`,(err,result)=>{
+            pool.query(`select id from cart where booking_id = '${req.body.booking_id}' and  categoryid = '${req.body.categoryid}' and usernumber = '${req.body.usernumber}' and status is null`,(err,result)=>{
                 if (err) throw err;
                 else if (result[0]) {
                   //  res.json(result[0])
@@ -529,7 +529,7 @@ router.post("/cart-handler", (req, res) => {
                 else {
                    // res.json(result)
                     pool.query(
-                        `select * from product where id = '${req.body.booking_id}' `,
+                        `select categoryid , subcategoryid , net_amount  from product where id = '${req.body.booking_id}' `,
                         (err, result) => {
                           if (err) throw err;
                           else {
