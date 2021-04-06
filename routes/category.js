@@ -111,10 +111,10 @@ router.post('/update_image',upload.single('image'), (req, res) => {
     body['image'] = req.file.filename
 
 
-    pool.query(`select image from ${table} where id = '${req.body.id}'`,(err,result)=>{
-        if(err) throw err;
-        else {
-            fs.unlinkSync(`public/images/${result[0].image}`); 
+    // pool.query(`select image from ${table} where id = '${req.body.id}'`,(err,result)=>{
+    //     if(err) throw err;
+    //     else {
+    //         fs.unlinkSync(`public/images/${result[0].image}`); 
 
 
  pool.query(`update ${table} set ? where id = ?`, [req.body, req.body.id], (err, result) => {
@@ -137,11 +137,6 @@ router.post('/update_image',upload.single('image'), (req, res) => {
     })
 
 
-        }
-    })
-
-  
-   
 })
 
 
