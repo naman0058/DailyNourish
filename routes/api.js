@@ -527,27 +527,15 @@ router.post("/cart-handler", (req, res) => {
                     })
                 }
                 else {
-                   // res.json(result)
-                    pool.query(
-                        `select categoryid , subcategoryid , net_amount  from product where id = '${req.body.booking_id}' `,
-                        (err, result) => {
-                          if (err) throw err;
-                          else {
-                            body["categoryid"] = result[0].categoryid;
-                            body["subcategoryid"] = result[0].subcategoryid;
-                            body["price"] = result[0].net_amount*req.body.quantity;
-                            body["oneprice"] = result[0].net_amount;
-                           pool.query(`insert into cart set ?`, body, (err, result) => {
-                              if (err) throw err;
-                              else {
-                                res.json({
-                                  msg: "updated sucessfully",
-                                });
-                              }
-                            });
-                          }
-                    
-                        })
+                  body["price"] = result[0].net_amount*req.body.quantity;
+                     pool.query(`insert into cart set ?`, body, (err, result) => {
+                     if (err) throw err;
+                     else {
+                       res.json({
+                         msg: "updated sucessfully",
+                       });
+                     }
+                   });
 
                 }
 
