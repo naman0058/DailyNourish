@@ -20,7 +20,7 @@ router.post('/index-category',(req,res)=>{
     var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
       var query2 = `select sum(price) as amount from cart where usernumber ='${req.body.number}' and status is null;`
       var query3 = `select * from banner where type = 'Front Banner';`
-      var query4 = `select  s.id,s.name, s.price , s.quantity , s.net_amount , s.image,* , 
+      var query4 = `select  s.id,s.name, s.price , s.quantity , s.net_amount , s.image, 
                     (select su.name from subcategory su where su.id = s.subcategoryid) as subcategoryname, 
                     (select c.quantity from cart c where c.booking_id = s.id and c.usernumber = '${req.body.number}' and c.status is null  ) as userquantity,
                     (select si.name from size si where si.id = s.sizeid) as sizename
@@ -60,7 +60,7 @@ router.post('/subcategory',(req,res)=>{
 
 
 router.post('/services',(req,res)=>{
-      var query = `select  s.id,s.name, s.price , s.quantity , s.net_amount , s.image,* , 
+      var query = `select  s.id,s.name, s.price , s.quantity , s.net_amount , s.image, 
                     (select su.name from subcategory su where su.id = s.subcategoryid) as subcategoryname, 
                     (select c.quantity from cart c where c.booking_id = s.id and c.usernumber = '${req.body.number}' and c.status is null  ) as userquantity,
                     (select si.name from size si where si.id = s.sizeid) as sizename
