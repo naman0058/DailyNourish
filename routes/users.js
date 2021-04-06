@@ -146,7 +146,7 @@ router.post('/update_image',upload.single('image'), (req, res) => {
 
 
 router.get('/wishlist',(req,res)=>{
-	pool.query(`select * from cart where usernumber = '${req.query.number}' and status is null`,(err,result)=>{
+	pool.query(`select c.* , (select p.name from product p where p.id = c.booking_id) as productname from cart c where c.usernumber = '${req.query.number}' and c.status is null`,(err,result)=>{
 		if(err) throw err;
        // else res.json(result)
         else res.render('show-wishlist',{result:result})
