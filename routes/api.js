@@ -263,7 +263,7 @@ router.post("/mycart", (req, res) => {
       (select si.name from size si where si.id = c.booking_id) as sizename
     from cart c where c.usernumber = '${req.body.usernumber}' and c.status is null;`
     var query1 = `select count(id) as counter from cart where usernumber = '${req.body.usernumber}' and status is null;`
-    var query2 = `select sum(c.price) as amount from cart c where 1 < (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;`
+    var query2 = `select sum(c.price) as total_amount from cart c where 1 < (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;`
     pool.query(query+query1+query2, (err, result) => {
       if (err) throw err;
       else if (result[0][0]) {
