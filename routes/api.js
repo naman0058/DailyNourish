@@ -454,7 +454,7 @@ router.post('/orders',(req,res)=>{
     pool.query(`insert into booking set ?`,body,(err,result)=>{
         if(err) throw err;
         else {
-          let insertId = result[0].insertId
+          let insertId = result.insertId
 
           pool.query(`select * from cart where usernumber = '${req.body.number}' and status is null`,(err,result)=>{
             if(err) throw err;
