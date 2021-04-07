@@ -536,7 +536,7 @@ router.post("/cart-handler", (req, res) => {
         let body = req.body
         console.log(req.body)
         if (req.body.quantity == "0" || req.body.quantity == 0) {
-        pool.query(`delete from cart where booking_id = '${req.body.booking_id}' and  usernumber = '${req.body.usernumber}'`,(err,result)=>{
+        pool.query(`delete from cart where booking_id = '${req.body.booking_id}' and  usernumber = '${req.body.usernumber}' and status is null`,(err,result)=>{
             if (err) throw err;
             else {
               res.json({
