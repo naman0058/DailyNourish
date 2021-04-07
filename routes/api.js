@@ -18,7 +18,7 @@ today = mm + '/' + dd + '/' + yyyy;
 router.post('/index-category',(req,res)=>{
     var query = `select * from category order by id desc limit 6;`
     var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
-      var query2 = `select sum(c.price) as amount from cart c where 1 <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;`
+      var query2 = `select sum(c.price) as amount from cart c where c.quantity <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;`
       var query3 = `select * from banner where type = 'Front Banner';`
       var query4 = `select  s.*,
                     (select su.name from subcategory su where su.id = s.subcategoryid) as subcategoryname, 
@@ -46,7 +46,7 @@ router.post('/services1',(req,res)=>{
   (select si.name from size si where si.id = s.sizeid) as sizename
    from product s order by id desc limit 5;`
 var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
-  var query2 = `select sum(c.price) as amount from cart c where 1 <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;;`
+  var query2 = `select sum(c.price) as amount from cart c where c.quantity <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;;`
   
 pool.query(query+query1+query2,(err,result)=>{
     if(err) throw err;
@@ -73,7 +73,7 @@ router.get('/allcategory',(req,res)=>{
 router.post('/subcategory',(req,res)=>{
       var query = `select s.* , (select c.name from category c where c.id = s.categoryid) as categoryname from subcategory s where s.categoryid = '${req.body.categoryid}';`
         var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
-      var query2 = `select sum(c.price) as amount from cart c where 1 <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;;`
+      var query2 = `select sum(c.price) as amount from cart c where c.quantity <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;;`
       pool.query(query+query1+query2,(err,result)=>{
         if(err) throw err;
         else res.json(result)
@@ -89,7 +89,7 @@ router.post('/services',(req,res)=>{
                     (select si.name from size si where si.id = s.sizeid) as sizename
                      from product s where s.subcategoryid = '${req.body.subcategoryid}';`
    var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
-      var query2 = `select sum(c.price) as amount from cart c where 1 <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;;`
+      var query2 = `select sum(c.price) as amount from cart c where c.quantity <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.number}' and c.status is null;;`
       
     pool.query(query+query1+query2,(err,result)=>{
         if(err) throw err;
@@ -263,13 +263,13 @@ router.post("/mycart", (req, res) => {
       (select si.name from size si where si.id = c.booking_id) as sizename
     from cart c where c.usernumber = '${req.body.usernumber}' and c.status is null;`
     var query1 = `select count(id) as counter from cart where usernumber = '${req.body.usernumber}' and status is null;`
-    var query2 = `select sum(c.price) as total_ammount from cart c where 1 <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.usernumber}' and c.status is null;`
+    var query2 = `select sum(c.price) as total_ammount from cart c where c.quantity <= (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.usernumber}' and c.status is null;`
     var query3 = `select c.*,(select s.name from product s where s.id = c.booking_id) as servicename
     ,(select s.image from product s where s.id = c.booking_id) as productlogo,
     (select s.quantity from product s where s.id = c.booking_id) as productquantity,
       (select si.name from size si where si.id = c.booking_id) as sizename
-    from cart c where 1 <= (select p.quantity from product p where p.id = c.booking_id ) and c.usernumber = '${req.body.usernumber}' and c.status is null;`
-    var query4 = `select count(id) as counter from cart c where 1 <= (select p.quantity from product p where p.id = c.booking_id ) and c.usernumber = '${req.body.usernumber}' and c.status is null`
+    from cart c where c.quantity <= (select p.quantity from product p where p.id = c.booking_id ) and c.usernumber = '${req.body.usernumber}' and c.status is null;`
+    var query4 = `select count(id) as counter from cart c where c.quantity <= (select p.quantity from product p where p.id = c.booking_id ) and c.usernumber = '${req.body.usernumber}' and c.status is null`
     pool.query(query+query1+query2+query3+query4, (err, result) => {
       if (err) throw err;
       else if (result[0][0]) {
@@ -486,7 +486,7 @@ router.post('/orders',(req,res)=>{
         else {
           let insertId = result.insertId
 
-          pool.query(`select * from cart c where 1 <= (select p.quantity from product p where p.id = c.booking_id ) and c.usernumber = '${req.body.number}' and c.status is null`,(err,result)=>{
+          pool.query(`select * from cart c where c.quantity <= (select p.quantity from product p where p.id = c.booking_id ) and c.usernumber = '${req.body.number}' and c.status is null`,(err,result)=>{
             if(err) throw err;
             else {
               for(i=0;i<result.length;i++){
