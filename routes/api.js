@@ -491,10 +491,11 @@ router.post('/orders',(req,res)=>{
             else {
           //    res.json(result)
               for(i=0;i<result.length;i++){
+                let booking_id = result[i].booking_id
                 pool.query(`update product set quantity = quantity - '${result[i].quantity}' where id = '${result[i].booking_id}'`,(err,result)=>{
                   if(err) throw err;
                   else {
-                    pool.query(`update cart set status = 'booked' , orderid = '${insertId}' where usernumber = '${req.body.number}' and booking_id='${result[i].booking_id}' and status is null`,(err,result)=>{
+                    pool.query(`update cart set status = 'booked' , orderid = '${insertId}' where usernumber = '${req.body.number}' and booking_id ='${booking_id}' and status is null`,(err,result)=>{
                       if(err) throw err;
                       else {
                            res.json({
