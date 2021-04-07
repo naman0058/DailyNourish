@@ -628,58 +628,101 @@ router.post('/get-single-booking-details',(req,res)=>{
 
 
 
-router.post('/reorder',(req,res)=>{
-    let data  = []
+// router.post('/reorder',(req,res)=>{
+//     let data  = []
     
     
-    if(req.body.status=='fromcancel'){
-         pool.query(`select categoryid , subcategoryid , booking_id , number  , amount  , name , address , pincode , quantity , orderid as id from cancel_booking where id = '${req.body.id}'`,(err,result)=>{
-        if(err) throw err;
-        else {
+//     if(req.body.status=='fromcancel'){
+//          pool.query(`select categoryid , subcategoryid , booking_id , number  , amount  , name , address , pincode , quantity , orderid as id from cancel_booking where id = '${req.body.id}'`,(err,result)=>{
+//         if(err) throw err;
+//         else {
            
-              data  = result[0]
-           //    res.json(data)
-            data['status'] = 'pending'
-            data['time'] = req.body.time
-            data['order_date'] = today
-            data['date'] = req.body.date
+//               data  = result[0]
+//            //    res.json(data)
+//             data['status'] = 'pending'
+//             data['time'] = req.body.time
+//             data['order_date'] = today
+//             data['date'] = req.body.date
             
-              pool.query(`insert into booking set ?`,data,(err,result)=>{
-        if(err) throw err;
-        else res.json({
-            msg :'success'
-        })
-    })
+//               pool.query(`insert into booking set ?`,data,(err,result)=>{
+//         if(err) throw err;
+//         else res.json({
+//             msg :'success'
+//         })
+//     })
         
                 
-        }
-    })
-    }
-    else {
-         pool.query(`select categoryid , subcategoryid , booking_id , number  , amount , status , name , address , pincode , quantity   from booking where id = '${req.body.id}'`,(err,result)=>{
-        if(err) throw err;
-        else {
+//         }
+//     })
+//     }
+//     else {
+//          pool.query(`select categoryid , subcategoryid , booking_id , number  , amount , status , name , address , pincode , quantity   from booking where id = '${req.body.id}'`,(err,result)=>{
+//         if(err) throw err;
+//         else {
            
-              data  = result[0]
-           //    res.json(data)
-            data['status'] = 'pending'
-            data['time'] = req.body.time
-            data['order_date'] = today
-            data['date'] = req.body.date
-              pool.query(`insert into booking set ?`,data,(err,result)=>{
-        if(err) throw err;
-        else res.json({
-            msg :'success'
-        })
-    })
+//               data  = result[0]
+//            //    res.json(data)
+//             data['status'] = 'pending'
+//             data['time'] = req.body.time
+//             data['order_date'] = today
+//             data['date'] = req.body.date
+//               pool.query(`insert into booking set ?`,data,(err,result)=>{
+//         if(err) throw err;
+//         else res.json({
+//             msg :'success'
+//         })
+//     })
         
                 
-        }
-    })
-    }
+//         }
+//     })
+//     }
     
    
+// })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+router.post('/reorder',(req,res)=>{
+  let data  = []
+    pool.query(`select usernumber , booking_id , categoryid , subcategoryid , price , quantity , oneprice from cart where orderid = '${req.body.id}'`,(err,result)=>{
+          if(err) throw err;
+          else {
+            data = result[0]
+               for(i=0;i<result[0].length;i++){
+              pool.query(`insert into cart set ?`,data,(err,result)=>{
+                if(err) throw err;
+              
+              })
+            }
+            res.json({msg:'success'})
+           
+          }
+        })
+  
+
 })
+
 
 
 // api create krni h booking data ki
