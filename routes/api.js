@@ -455,7 +455,7 @@ router.post('/orders',(req,res)=>{
         if(err) throw err;
         else {
 
-          pool.query(`select * from cart where usernumber = '${req.body.number}' where status is null`,(err,result)=>{
+          pool.query(`select * from cart where usernumber = '${req.body.number}' and status is null`,(err,result)=>{
             if(err) throw err;
             else {
               for(i=0;i<result.length;i++){
