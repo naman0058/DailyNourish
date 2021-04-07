@@ -264,7 +264,13 @@ router.post("/mycart", (req, res) => {
     from cart c where c.usernumber = '${req.body.usernumber}' and c.status is null;`
     var query1 = `select count(id) as counter from cart where usernumber = '${req.body.usernumber}' and status is null;`
     var query2 = `select sum(c.price) as total_ammount from cart c where 1 < (select p.quantity from product p where p.id = c.booking_id ) and  c.usernumber = '${req.body.usernumber}' and c.status is null;`
-    pool.query(query+query1+query2, (err, result) => {
+    var query3 = `select c.*,(select s.name from product s where s.id = c.booking_id) as servicename
+    ,(select s.image from product s where s.id = c.booking_id) as productlogo,
+    (select s.quantity from product s where s.id = c.booking_id) as productquantity,
+      (select si.name from size si where si.id = c.booking_id) as sizename
+    from cart c where 1 < (select p.quantity from product p where p.id = c.booking_id ) and c.usernumber = '${req.body.usernumber}' and c.status is null;`
+    var query4 = `select count(id) as counter from cart c where 1 < (select p.quantity from product p where p.id = c.booking_id ) and c.usernumber = '${req.body.usernumber}' and c.status is null`
+    pool.query(query+query1+query2+query3+query4, (err, result) => {
       if (err) throw err;
       else if (result[0][0]) {
         req.body.mobilecounter = result[1][0].counter;
