@@ -708,12 +708,12 @@ router.post('/reorder',(req,res)=>{
     pool.query(`select usernumber , booking_id , categoryid , subcategoryid , price , quantity , oneprice from cart where orderid = '${req.body.id}'`,(err,result)=>{
           if(err) throw err;
           else {
-            console.log('result',result)
+            
             data = result[0]
                for(i=0;i<result[0].length;i++){
               pool.query(`insert into cart set ?`,data,(err,result)=>{
                 if(err) throw err;
-              
+                console.log('result aaya ',result)
               })
             }
             res.json({msg:'success'})
