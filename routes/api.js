@@ -462,18 +462,18 @@ router.post('/orders',(req,res)=>{
                 pool.query(`update product set quantity = quantity - '${result[i].quantity}' where id = '${result[i].booking_id}'`,(err,result)=>{
                   if(err) throw err;
                   else {
-             
+                    pool.query(`update cart set status = 'booked' , orderid = '${result.insertId}' where usernumber = '${req.body.number}' and status is null`,(err,result)=>{
+                      if(err) throw err;
+                      else {
+                           res.json({
+                  msg :'success'
+              })
+                      }
+                  })
                   }
                 })
               }
-              pool.query(`update cart set status = 'booked' , orderid = '${result.insertId}' where usernumber = '${req.body.number}' and status is null`,(err,result)=>{
-                if(err) throw err;
-                else {
-                     res.json({
-            msg :'success'
-        })
-                }
-            })
+            
             
             }
           })
