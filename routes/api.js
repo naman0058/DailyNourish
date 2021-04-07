@@ -489,22 +489,22 @@ router.post('/orders',(req,res)=>{
           pool.query(`select * from cart c where c.quantity <= (select p.quantity from product p where p.id = c.booking_id ) and c.usernumber = '${req.body.number}' and c.status is null`,(err,result)=>{
             if(err) throw err;
             else {
-              res.json(result)
-              // for(i=0;i<result.length;i++){
-              //   pool.query(`update product set quantity = quantity - '${result[i].quantity}' where id = '${result[i].booking_id}'`,(err,result)=>{
-              //     if(err) throw err;
-              //     else {
-              //       pool.query(`update cart set status = 'booked' , orderid = '${insertId}' where usernumber = '${req.body.number}' and status is null`,(err,result)=>{
-              //         if(err) throw err;
-              //         else {
-              //              res.json({
-              //     msg :'success'
-              // })
-              //         }
-              //     })
-              //     }
-              //   })
-              // }
+          //    res.json(result)
+              for(i=0;i<result.length;i++){
+                pool.query(`update product set quantity = quantity - '${result[i].quantity}' where id = '${result[i].booking_id}'`,(err,result)=>{
+                  if(err) throw err;
+                  else {
+                    pool.query(`update cart set status = 'booked' , orderid = '${insertId}' where usernumber = '${req.body.number}' and booking_id='${result[i].booking_id}' and status is null`,(err,result)=>{
+                      if(err) throw err;
+                      else {
+                           res.json({
+                  msg :'success'
+              })
+                      }
+                  })
+                  }
+                })
+              }
             
             
             }
