@@ -709,7 +709,7 @@ router.post('/reorder',(req,res)=>{
           if(err) throw err;
           else {
             console.log('result nikla ',result)
-            data = result[0]
+            data = result[0][1]
                for(i=0;i<result[0].length;i++){
               pool.query(`insert into cart set ?`,data,(err,result)=>{
                 if(err) throw err;
