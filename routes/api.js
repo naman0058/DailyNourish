@@ -454,6 +454,7 @@ router.post('/orders',(req,res)=>{
     pool.query(`insert into booking set ?`,body,(err,result)=>{
         if(err) throw err;
         else {
+          let insertId = result[0].insertId
 
           pool.query(`select * from cart where usernumber = '${req.body.number}' and status is null`,(err,result)=>{
             if(err) throw err;
@@ -462,7 +463,7 @@ router.post('/orders',(req,res)=>{
                 pool.query(`update product set quantity = quantity - '${result[i].quantity}' where id = '${result[i].booking_id}'`,(err,result)=>{
                   if(err) throw err;
                   else {
-                    pool.query(`update cart set status = 'booked' , orderid = '${result[0].insertId}' where usernumber = '${req.body.number}' and status is null`,(err,result)=>{
+                    pool.query(`update cart set status = 'booked' , orderid = '${insertId}' where usernumber = '${req.body.number}' and status is null`,(err,result)=>{
                       if(err) throw err;
                       else {
                            res.json({
