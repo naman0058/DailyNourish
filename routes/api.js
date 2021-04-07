@@ -516,7 +516,7 @@ router.post("/cart-handler", (req, res) => {
             pool.query(`select oneprice from cart where booking_id = '${req.body.booking_id}' and  categoryid = '${req.body.categoryid}' and usernumber = '${req.body.usernumber}' and status is null`,(err,result)=>{
                 if (err) throw err;
                 else if (result[0]) {
-                  //  res.json(result[0])
+                    res.json(result[0])
                     pool.query(`update cart set quantity = ${req.body.quantity} , price = ${result[0].oneprice}*${req.body.quantity}  where booking_id = '${req.body.booking_id}' and categoryid = '${req.body.categoryid}' and usernumber = '${req.body.usernumber}'`,(err,result)=>{
                         if (err) throw err;
                         else {
@@ -528,7 +528,7 @@ router.post("/cart-handler", (req, res) => {
                     })
                 }
                 else {
-                  body["price"] = 50
+                  body["price"] = (req.body.price)*(req.body.quantity)
                      pool.query(`insert into cart set ?`, body, (err, result) => {
                      if (err) throw err;
                      else {
