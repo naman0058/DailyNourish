@@ -33,6 +33,29 @@ router.post('/index-category',(req,res)=>{
 });
 
 
+
+
+
+
+
+
+router.post('/services1',(req,res)=>{
+  var query = `select  s.*,
+  (select su.name from subcategory su where su.id = s.subcategoryid) as subcategoryname, 
+  (select c.quantity from cart c where c.booking_id = s.id and c.usernumber = '${req.body.number}' and c.status is null  ) as userquantity,
+  (select si.name from size si where si.id = s.sizeid) as sizename
+   from product s order by id desc limit 5;`
+var query1 = `select sum(quantity) as counter from cart where usernumber ='${req.body.number}' and status is null;`
+  var query2 = `select sum(price) as amount from cart where usernumber ='${req.body.number}' and status is null;`
+  
+pool.query(query+query1+query2,(err,result)=>{
+    if(err) throw err;
+    else res.json(result)
+})
+})
+
+
+
 router.get('/',(req,res)=>{
     res.send('hi')
 })
