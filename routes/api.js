@@ -709,9 +709,10 @@ router.post('/reorder',(req,res)=>{
           if(err) throw err;
           else {
             console.log('result nikla ',result[0])
-            data = result[0][1]
-               for(i=0;i<result[0].length;i++){
-              pool.query(`insert into cart set ?`,data,(err,result)=>{
+              
+               for(i=0;i<result.length;i++){
+
+              pool.query(`insert into cart set ?`,result[i],(err,result)=>{
                 if(err) throw err;
                 console.log('result aaya ',result)
               })
