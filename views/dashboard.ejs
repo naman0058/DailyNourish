@@ -183,6 +183,7 @@
                         <th>Address</th>
                         <th>Progress</th>
                         <th>Price</th>
+                        <th>Status</th>
                         
                       </tr>
 
@@ -197,7 +198,25 @@
                         <td class="font-weight-600"><%=result[8][i].address%></td>
                         <td class="font-weight-600"><%=result[8][i].status%></td>
                        
-                        <td><%=result[8][i].price%></td>
+                        <td>Rs. <%=result[8][i].amount%></td>
+
+<% if(result[8][i].status=='pending') { %>
+
+ <td> <a href="/admin/update-status?id=<%=result[8][i].id%>&status=Dispatch">Dispatch</a></td>
+
+  <% } else { %>
+   
+    <td> <a href="/admin/update-status?id=<%=result[8][i].id%>&status=Completed">Completed</a></td>
+
+    <% } %>
+
+                        <td>
+                          <!-- <select class="form-control update_status"  id='<%=result[8][i].id%>'>
+                            <option value="-">Select Status</option>
+                            <option value="Dispatch">Dispatch</option>
+                            <option val>Completed</option>
+                          </select> -->
+                        </td>
                       
                            </tr>
 
@@ -337,5 +356,13 @@
   <script src="/light/assets/js/custom.js"></script>
 </body>
 
+
+<script>
+  $('.update_status').change(function(){
+    const id  = $(this).attr('id');
+    alert(id)
+
+  })
+</script>
 
 </html>

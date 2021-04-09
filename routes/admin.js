@@ -80,7 +80,7 @@ router.get('/dashboard',(req,res)=>{
     var query6 = `select count(id) as total from booking;`
     var query7 = `select sum(amount) as total from booking;`
     var query8 = `select sum(amount) as total from booking where date = '${today}';`
-    var query9 = `select * from booking order by id desc;`
+    var query9 = `select * from booking where status != 'Completed' order by id desc;`
     pool.query(query+query2+query3+query4+query5+query6+query7+query8+query9,(err,result)=>{
 if(err) throw err;
 else res.render('dashboard',{result:result})
@@ -93,6 +93,13 @@ else res.render('dashboard',{result:result})
 })
 
 
+
+router.get('/update-status',(req,res)=>{
+    pool.query(`update booking set status = '${req.query.status}' where id = '${req.query.id}'`,(err,result)=>{
+        if(err) throw err;
+        else res.redirect('/admin/dashboard')
+    })
+})
 
 
 module.exports = router;

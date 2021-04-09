@@ -50,7 +50,7 @@ router.post('/insert',(req,res)=>{
 
 
 router.get('/all',(req,res)=>{
-	pool.query(`select * from ${table} `,(err,result)=>{
+	pool.query(`select * from ${table} order by id desc`,(err,result)=>{
 		if(err) throw err;
         else res.json(result)
 	})
